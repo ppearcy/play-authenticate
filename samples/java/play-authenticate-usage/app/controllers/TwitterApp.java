@@ -57,7 +57,8 @@ public class TwitterApp extends Controller {
 		play.Configuration config = Play.application().configuration();
 		int tweetsToDisplay = config.getInt("play-twitter-client.timeline_count", 10);
 		
-		statusList = statusList.subList(0, tweetsToDisplay);
+		if (tweetsToDisplay < statusList.size())
+			statusList = statusList.subList(0, tweetsToDisplay);
 		
 		return ok(timeline.render(localUser, statusList, MessageTweet.TWEET_FORM));
 	}
