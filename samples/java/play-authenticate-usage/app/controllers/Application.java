@@ -2,18 +2,16 @@ package controllers;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import models.User;
 import play.Routes;
 import play.data.Form;
 import play.mvc.*;
-import play.mvc.Http.Response;
 import play.mvc.Http.Session;
-import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthProvider.MyLogin;
 import providers.MyUsernamePasswordAuthProvider.MySignup;
 
+import twitter4j.TwitterException;
 import views.html.*;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -22,22 +20,24 @@ import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
 import com.feth.play.module.pa.user.AuthUser;
 
+
 public class Application extends Controller {
 
 	public static final String FLASH_MESSAGE_KEY = "message";
 	public static final String FLASH_ERROR_KEY = "error";
 	public static final String USER_ROLE = "user";
 	
-	public static Result index() {
-		return ok(index.render());
-	}
-
 	public static User getLocalUser(final Session session) {
 		final AuthUser currentAuthUser = PlayAuthenticate.getUser(session);
 		final User localUser = User.findByAuthUserIdentity(currentAuthUser);
 		return localUser;
 	}
 
+	public static Result index() throws TwitterException {
+		// Redirect to the timeline
+		return TwitterApp.timeline();
+	}
+	
 	@Restrict(@Group(Application.USER_ROLE))
 	public static Result restricted() {
 		final User localUser = getLocalUser(session());
@@ -53,7 +53,7 @@ public class Application extends Controller {
 	public static Result login() {
 		return ok(login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM));
 	}
-
+	
 	public static Result doLogin() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 		final Form<MyLogin> filledForm = MyUsernamePasswordAuthProvider.LOGIN_FORM
