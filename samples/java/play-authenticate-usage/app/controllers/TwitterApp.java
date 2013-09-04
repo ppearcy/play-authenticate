@@ -8,6 +8,7 @@ import java.util.List;
 import models.User;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import twitter4j.TwitterException;
@@ -51,6 +52,12 @@ public class TwitterApp extends Controller {
 		} catch (TwitterHelper.TwitterBadTokens e) {
 			return com.feth.play.module.pa.controllers.Authenticate.authenticate("twitter");			
 		}
+		
+		// Truncate to last to
+		play.Configuration config = Play.application().configuration();
+		int tweetsToDisplay = config.getInt("play-twitter-client.timeline_count", 10);
+		
+		statusList = statusList.subList(0, tweetsToDisplay);
 		
 		return ok(timeline.render(localUser, statusList, MessageTweet.TWEET_FORM));
 	}
