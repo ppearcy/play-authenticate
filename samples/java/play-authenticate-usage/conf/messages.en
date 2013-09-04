@@ -62,7 +62,7 @@ playauthenticate.login.title=Login
 playauthenticate.login.password.placeholder=Password
 playauthenticate.login.now=Login now
 playauthenticate.login.forgot.password=Forgot your password?
-playauthenticate.login.oauth=or log in using one of the following providers:
+playauthenticate.login.oauth=Login with twitter:
 
 playauthenticate.signup.title=Signup
 playauthenticate.signup.name=Your name
@@ -82,7 +82,7 @@ playauthenticate.merge.accounts.true=Yes, merge these two accounts
 playauthenticate.merge.accounts.false=No, exit my current session and log in as a new user
 playauthenticate.merge.accounts.ok=OK
 
-playauthenticate.link.account.title=Link account
+playauthenticate.link.account.title=You are required to link to a twitter account to use this app. 
 playauthenticate.link.account.question=Link ({0}) with your user?
 playauthenticate.link.account.true=Yes, link this account
 playauthenticate.link.account.false=No, log out and create a new user with this account

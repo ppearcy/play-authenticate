@@ -16,6 +16,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	@Override
 	public Object save(final AuthUser authUser) {
 		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
+		
 		if (!isLinked) {
 			return User.create(authUser).id;
 		} else {
@@ -54,7 +55,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	public AuthUser update(final AuthUser knownUser) {
 		// User logged in again, bump last login date
 		User.setLastLoginDate(knownUser);
+		
 		return knownUser;
 	}
-
 }

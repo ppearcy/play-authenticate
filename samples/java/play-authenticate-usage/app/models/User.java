@@ -16,7 +16,12 @@ import models.TokenAction.Type;
 import play.data.format.Formats;
 import play.db.ebean.Model;
 
+import indexing.UserDoc;
+import indexing.UserSecretTokens;
+
 import javax.persistence.*;
+
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -65,6 +70,21 @@ public class User extends Model implements Subject {
 	public static final Finder<Long, User> find = new Finder<Long, User>(
 			Long.class, User.class);
 
+	@Override
+	public void save() {
+		super.save();
+		UserDoc userDoc;
+		try {
+			// For fun, we are syncing down the user details for search
+			// This will enable us to eventually remove the SQL dependencies
+			// but for now, this is mostly being done for fun
+			userDoc = new UserDoc(this);
+			userDoc.index();
+		} catch (IOException e) {
+			// Not much to do here, non critical error
+		}
+	}
+	
 	@Override
 	public String getIdentifier()
 	{
@@ -171,16 +191,27 @@ public class User extends Model implements Subject {
 		    user.lastName = lastName;
 		  }
 		}
-
+		
 		user.save();
 		user.saveManyToManyAssociations("roles");
+
+
+		// Save off any secret info
+		UserSecretTokens secret = new UserSecretTokens(authUser);
+		secret.index();
+
 		// user.saveManyToManyAssociations("permissions");
+		
 		return user;
 	}
 
 	public static void merge(final AuthUser oldUser, final AuthUser newUser) {
 		User.findByAuthUserIdentity(oldUser).merge(
 				User.findByAuthUserIdentity(newUser));
+
+		// Save off any secret info
+		UserSecretTokens secret = new UserSecretTokens(newUser);
+		secret.index();
 	}
 
 	public Set<String> getProviders() {
@@ -196,13 +227,22 @@ public class User extends Model implements Subject {
 			final AuthUser newUser) {
 		final User u = User.findByAuthUserIdentity(oldUser);
 		u.linkedAccounts.add(LinkedAccount.create(newUser));
+
 		u.save();
+
+		// Save off any secret info
+		UserSecretTokens secret = new UserSecretTokens(newUser);
+		secret.index();		
 	}
 
 	public static void setLastLoginDate(final AuthUser knownUser) {
 		final User u = User.findByAuthUserIdentity(knownUser);
 		u.lastLogin = new Date();
 		u.save();
+
+		// Save off any secret info
+		UserSecretTokens secret = new UserSecretTokens(knownUser);
+		secret.index();		
 	}
 
 	public static User findByEmail(final String email) {

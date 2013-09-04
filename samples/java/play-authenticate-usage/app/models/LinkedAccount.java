@@ -4,11 +4,14 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import play.db.ebean.Model;
 
 import com.feth.play.module.pa.user.AuthUser;
 
 @Entity
+@JsonIgnoreProperties({"user"})		// If serializing to JSON, this creates a circular dependency
 public class LinkedAccount extends Model {
 
 	/**

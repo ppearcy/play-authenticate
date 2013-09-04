@@ -1,0 +1,26 @@
+@(localUser: models.User = null, messages: List[twitter4j.Status], tweetForm: Form[_])
+
+@import helper._
+
+@main(Messages("playauthenticate.index.title")) {
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+    	@helper.form(action = routes.TwitterApp.doTweet) {
+    		@helper.inputText(tweetForm("Message"), 
+    		'id -> "Message", 
+    		'size -> 140, 
+    		'maxlength -> 140,
+            '_label -> "Post a tweet:"
+    		)
+			}          
+
+        <h2>Timeline for @localUser.name</h2>
+		<ul>
+		@for(p <- messages) {
+		  <h3><li>@p.getText()</li></h3>
+		} 
+		</ul>      
+      </div>
+
+    	}
+   
