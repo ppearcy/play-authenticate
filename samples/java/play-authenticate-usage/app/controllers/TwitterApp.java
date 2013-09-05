@@ -75,24 +75,27 @@ public class TwitterApp extends Controller {
 		// Need to figure out why, but for now, this works
 		//final Form<MessageTweet> filledForm  = MessageTweet.TWEET_FORM.bindFromRequest();
 		String message = request().body().asFormUrlEncoded().get("Message")[0];
+		message = message.trim();
 		
-		// Ensure message is 140 characters. If it is any more than this, just truncated it and carry on
-		message = message.substring(0, Math.min(message.length(), 140));
-		
-		final User localUser = Application.getLocalUser(session());
-		UserDoc user = UserDoc.find.byId(Long.toString(localUser.id));
-
-		AccessToken twitterAccessToken = user.getTwitterAccessToken();
-		if (twitterAccessToken == null) {
-			return com.feth.play.module.pa.controllers.Authenticate.authenticate("twitter");
-		}
-		
-		try {
-			TwitterHelper.postTwitterMessage(message, twitterAccessToken);
-		} catch (TwitterHelper.TwitterBadTokens e) {
-			return com.feth.play.module.pa.controllers.Authenticate.authenticate("twitter");			
-		}
-
+		if (message.length() > 0)
+		{
+			// Ensure message is 140 characters. If it is any more than this, just truncated it and carry on
+			message = message.substring(0, Math.min(message.length(), 140));
+			
+			final User localUser = Application.getLocalUser(session());
+			UserDoc user = UserDoc.find.byId(Long.toString(localUser.id));
+	
+			AccessToken twitterAccessToken = user.getTwitterAccessToken();
+			if (twitterAccessToken == null) {
+				return com.feth.play.module.pa.controllers.Authenticate.authenticate("twitter");
+			}
+			
+			try {
+				TwitterHelper.postTwitterMessage(message, twitterAccessToken);
+			} catch (TwitterHelper.TwitterBadTokens e) {
+				return com.feth.play.module.pa.controllers.Authenticate.authenticate("twitter");			
+			}
+		}	
 		return timeline();
 	}
 }
