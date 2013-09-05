@@ -4,6 +4,7 @@ import forms.MessageTweet;
 import indexing.UserDoc;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import models.User;
 import be.objectify.deadbolt.java.actions.Group;
@@ -51,7 +52,13 @@ public class TwitterApp extends Controller {
 			statusList = TwitterHelper.getTimeline(twitterAccessToken);
 		} catch (TwitterHelper.TwitterBadTokens e) {
 			return com.feth.play.module.pa.controllers.Authenticate.authenticate("twitter");			
-		}
+		} catch (TwitterException e) {
+			flash(Application.FLASH_MESSAGE_KEY, e.getErrorMessage());
+			statusList = new ArrayList<twitter4j.Status>();
+		} catch (Exception e) {
+			flash(Application.FLASH_MESSAGE_KEY, e.getMessage());
+			statusList = new ArrayList<twitter4j.Status>();
+		} 
 		
 		// Truncate to last to
 		play.Configuration config = Play.application().configuration();
@@ -94,6 +101,10 @@ public class TwitterApp extends Controller {
 				TwitterHelper.postTwitterMessage(message, twitterAccessToken);
 			} catch (TwitterHelper.TwitterBadTokens e) {
 				return com.feth.play.module.pa.controllers.Authenticate.authenticate("twitter");			
+			} catch (TwitterException e) {
+				flash(Application.FLASH_MESSAGE_KEY, e.getErrorMessage());
+			} catch (Exception e) {
+				flash(Application.FLASH_MESSAGE_KEY, e.getMessage());
 			}
 		}	
 		return timeline();
